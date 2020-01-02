@@ -161,14 +161,14 @@ def from_page(chromelogs):
 			har["pages"].append(page)
 		if event.get("method") == "Network.requestWillBeSent":
 			if len(har["pages"]) < 1:
-				print("have a error")
+				print("start request")
 			params = {}
 			for key, value in event.get("params").items():
 				params[key] = value
-			if params.get("request").get("postData"):
-				bodysize = len(params.get("request").get("postData"))
-			else:
-				bodysize = 0
+		# 	if params.get("request").get("postData"):
+		# 		bodysize = len(params.get("request").get("postData"))
+		# 	else:
+		# 		bodysize = 0
 			req = {
 				"method": params.get("request").get("method"),
 				"url": params.get("request").get("url"),
@@ -177,30 +177,30 @@ def from_page(chromelogs):
 				"queryString": ParseQuertString(params.get("request")),
 				"cookies": "",
 				"headersSize": "",
-				"bodySize": bodysize,
+				"bodySize": "",
 				"timestamp": params.get("timestamp")
 			}
-			entry = {
-				"startDateTime": EpochToTime(params.get("wallTime")),
-				"time": "",
-				"request": req,
-				"response": {},
-				"cache": {},
-				"timings": "",
-				"pageref": getCurrentPageId(har),
-				"requestId": params.get("requestId")
-			}
-			if params.get("redirectResponse"):
-				lastEntry = GetEntryByRequestId(har, params.get("requestId"))
-				lastEntry["requestId"] = lastEntry.get("requestId") + "r"
-				lastEntry["request"], lastEntry["response"], lastEntry["timings"] = ProcessResponse(lastEntry, params.get("timestamp"), params.get("redirectResponse"))
-				lastEntry["response"]["redirectUrl"] = params.get("request").get("url")
-				lastEntry["timings"]["receive"] = 0.0
-			har["entries"].append(entry)
-			pagenum = CurrentPage(har)
-			if not har["pages"][pagenum]["title"]:
-				har["pages"][pagenum]["title"] = req.get("url")
-				har["pages"][pagenum]["timestamp"] = params["timestamp"]
+		# 	entry = {
+		# 		"startDateTime": EpochToTime(params.get("wallTime")),
+		# 		"time": "",
+		# 		"request": req,
+		# 		"response": {},
+		# 		"cache": {},
+		# 		"timings": "",
+		# 		"pageref": getCurrentPageId(har),
+		# 		"requestId": params.get("requestId")
+		# 	}
+		# 	if params.get("redirectResponse"):
+		# 		lastEntry = GetEntryByRequestId(har, params.get("requestId"))
+		# 		lastEntry["requestId"] = lastEntry.get("requestId") + "r"
+		# 		lastEntry["request"], lastEntry["response"], lastEntry["timings"] = ProcessResponse(lastEntry, params.get("timestamp"), params.get("redirectResponse"))
+		# 		lastEntry["response"]["redirectUrl"] = params.get("request").get("url")
+		# 		lastEntry["timings"]["receive"] = 0.0
+		# 	har["entries"].append(entry)
+		# 	pagenum = CurrentPage(har)
+		# 	if not har["pages"][pagenum]["title"]:
+		# 		har["pages"][pagenum]["title"] = req.get("url")
+		# 		har["pages"][pagenum]["timestamp"] = params["timestamp"]
 
 		if event.get("method") == "":
 			pass
@@ -222,21 +222,21 @@ if __name__ == '__main__':
 		info = json.loads(f.read())
 	# for key, value in info[0].items():
 	# 	print(key, value)
-	print(info[0])
+	# print(info[0])
 	logs = NewFormLogEntries(info)
-	har = {
-		"version": "1.2",
-		"creator": {"name": "har capture", "version": "0.1"},
-		"pages": [],
-		"entries": []
-	}
-	print(logs[0])
-	for log in logs:
-		if log.get("method") == "Page.frameStartedLoading":
-			print(log)
+	# har = {
+	# 	"version": "1.2",
+	# 	"creator": {"name": "har capture", "version": "0.1"},
+	# 	"pages": [],
+	# 	"entries": []
+	# }
+	# print(logs[0])
+	# for log in logs:
+	# 	if log.get("method") == "Page.frameStartedLoading":
+	# 		page = {"startDateTime": log.get(""), ""}
 
-	# har = from_page(logs)
-	# with open('test.har', 'w') as f:
-	# 	f.write(json.dumps(har))
-	# print(logs)
+	har = from_page(logs)
+	with open('test.har', 'w') as f:
+		f.write(json.dumps(har))
+	print(har)
   
